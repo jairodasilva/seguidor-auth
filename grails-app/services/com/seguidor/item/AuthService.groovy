@@ -20,7 +20,7 @@ trait AuthService implements RestService {
 
     private getUserInfo(callerId) {
         try {
-            return getResource("seguidor/users/${callerId}")
+            return getResource("seguidor/users/${callerId}?caller.id=${callerId}")
         }
         catch (Exception e) {
             throw new NotFoundException('callerId does not exist', 'Invalid caller.id')

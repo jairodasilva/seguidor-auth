@@ -8,7 +8,7 @@ import meli.exceptions.MercadoLibreAPIException
 import meli.exceptions.NotFoundException
 import meli.exceptions.ForbiddenException
 import meli.exceptions.UnauthorizedException
-//import org.apache.log4j.Logger
+import org.apache.log4j.Logger
 import org.grails.web.json.JSONElement
 import org.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
@@ -21,24 +21,17 @@ import org.springframework.http.ResponseEntity
  */
 trait RestService {
 
-    //private static final Logger logger = Logger.getLogger(RestService.class)
+    private static final Logger log = Logger.getLogger(getClass())
 
     RestBuilder restBuilder = Holders.grailsApplication.getMainContext().getBean('restBuilder')
     String baseURL = Holders.grailsApplication.config.getProperty('grails.serverURL')
+    public init(){
 
+    }
     JSONElement getResource(String url) {
         def response = restBuilder.get("${baseURL}${url}")
         handleResponse(response.responseEntity)
-        //logger.info("Returning" + url + " info: " + response.responseEntity.body )
-        return JSON.parse(response.responseEntity.body.toString())
-    }
-
-    JSONElement putResource(String url, JSONObject objectParam) {
-        url = "${baseURL}${url}"
-        def response = restBuilder.put(url) {
-            json objectParam.toString()
-        }
-        handleResponse(response.responseEntity)
+        log.info("Returning" + url + " info: " + response.responseEntity.body )
         return JSON.parse(response.responseEntity.body.toString())
     }
 
@@ -61,7 +54,18 @@ trait RestService {
         return JSON.parse(response.responseEntity.body.toString())
     }
 
-    private handleResponse(ResponseEntity responseEntity) {
+    JSONElement putResource(String url, JSONObject objectParam)
+    {
+        url = "${baseURL}${url}"
+        def response =  restBuilder.put(url){
+            json objectParam
+        }
+        handleResponse(response.responseEntity)
+        log.info("Returning" + url + " info: " + response.responseEntity.body )
+        return JSON.parse(response.responseEntity.body.toString())
+    }
+
+    def handleResponse(ResponseEntity responseEntity) {
         HttpStatus statusCode = responseEntity.statusCode
         if (HttpStatus.OK != statusCode && HttpStatus.CREATED != statusCode) {
             def errorMsg = "${responseEntity.body}"
