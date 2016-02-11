@@ -6,6 +6,8 @@ import grails.util.Holders
 import meli.exceptions.BadRequestException
 import meli.exceptions.MercadoLibreAPIException
 import meli.exceptions.NotFoundException
+import meli.exceptions.ForbiddenException
+import meli.exceptions.UnauthorizedException
 import org.apache.log4j.Logger
 import org.grails.web.json.JSONElement
 import org.grails.web.json.JSONObject
@@ -44,19 +46,25 @@ trait RestService {
         return JSON.parse(response.responseEntity.body.toString())
     }
 
-    private handleResponse(ResponseEntity responseEntity){
+    def handleResponse(ResponseEntity responseEntity) {
         HttpStatus statusCode = responseEntity.statusCode
-        if (HttpStatus.OK!=statusCode && HttpStatus.ACCEPTED!=statusCode){
+        if (HttpStatus.OK != statusCode && HttpStatus.CREATED != statusCode) {
             def errorMsg = "${responseEntity.body}"
-            log.error(errorMsg)
+            logger.error(errorMsg)
             if (HttpStatus.NOT_FOUND == statusCode) {
-                log.error(errorMsg)
+                logger.error(errorMsg)
                 throw new NotFoundException(errorMsg)
             } else if (HttpStatus.BAD_REQUEST == statusCode) {
-                log.error(errorMsg)
+                logger.error(errorMsg)
                 throw new BadRequestException(errorMsg)
+            } else if (HttpStatus.FORBIDDEN == statusCode) {
+                logger.error(errorMsg)
+                throw new ForbiddenException(errorMsg)
+            } else if (HttpStatus.UNAUTHORIZED == statusCode) {
+                logger.error(errorMsg)
+                throw new UnauthorizedException(errorMsg)
             } else {
-                log.error(errorMsg)
+                logger.error(errorMsg)
                 throw new MercadoLibreAPIException(errorMsg)
             }
         }
