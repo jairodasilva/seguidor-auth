@@ -14,6 +14,7 @@ import org.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.StringHttpMessageConverter
+import java.nio.charset.Charset
 
 /**
  * Common service options
