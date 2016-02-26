@@ -20,6 +20,7 @@ class User {
     String phone2
     String companyName
     String companyPhone
+    String logo
 
     def getPermissions() {
         def permissions
@@ -84,6 +85,11 @@ class User {
     }
 
     static User buildUser(JSONElement userData, JSONElement companyData) {
+        def areaCode = (userData.containsKey('phone') && userData.get('phone').containsKey('area_code')) ? userData.get('phone').get('area_code') : ''
+        def number = (userData.containsKey('phone') && userData.get('phone').containsKey('number')) ? userData.get('phone').get('number') : ''
+        def area_code2 = (userData.containsKey('alternative_phone') && userData.get('alternative_phone').containsKey('area_code')) ? userData.get('alternative_phone').get('area_code') : ''
+        def number2 = (userData.containsKey('alternative_phone') && userData.get('alternative_phone').containsKey('number')) ? userData.get('alternative_phone').get('number') : ''
+        def companyPhone = (companyData?.phone && companyData.phone?.area_code) ? companyData.get('phone').get('area_code') + ' - '+ companyData.get('phone').get('number') : ''
         new User(
             id:userData.id,
             nickname:userData.nickname,
@@ -94,12 +100,13 @@ class User {
             type:userData.user_type,
             role:userData.role,
             status:userData.status,
-            areaCode:userData?.phone?.area_code,
-            phone:userData?.phone?.number,
-            areaCode2:userData?.alternative_phone?.area_code ? userData?.alternative_phone?.area_code:'',
-            phone2:userData?.alternative_phone?.number ? userData?.alternative_phone?.number:'',
-            companyName:"${companyData?.company?.first_name} ${companyData?.company?.last_name}",
-            companyPhone:"${companyData?.company?.phone?.area_code} ${companyData?.company?.phone?.number}"
+            areaCode:areaCode,
+            phone:number,
+            areaCode2:area_code2,
+            phone2:number2,
+            companyName:"${companyData?.first_name} ${companyData?.last_name}",
+            companyPhone:companyPhone,
+            logo:companyData?.logo
         )
     }
 

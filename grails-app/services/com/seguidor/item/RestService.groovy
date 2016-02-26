@@ -13,6 +13,7 @@ import org.grails.web.json.JSONElement
 import org.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.StringHttpMessageConverter
 
 /**
  * Common service options
@@ -36,9 +37,11 @@ trait RestService {
     }
 
     JSONElement postResource(String url, JSONObject objectParam) {
+        this.restBuilder.restTemplate.setMessageConverters([new StringHttpMessageConverter(Charset.defaultCharset.forName("UTF-8"))])
         url = "${baseURL}${url}"
         def response = restBuilder.post(url) {
             json objectParam.toString()
+            header('Content-Type',' application/json;charset=UTF-8')
         }
         handleResponse(response.responseEntity)
         return JSON.parse(response.responseEntity.body.toString())
@@ -66,8 +69,8 @@ trait RestService {
     }
 
     def handleResponse(ResponseEntity responseEntity) {
-        HttpStatus statusCode = responseEntity.statusCode
-        if (HttpStatus.OK != statusCode && HttpStatus.CREATED != statusCode) {
+        def statusCode =  responseEntity.statusCode
+        if (!(statusCode in [HttpStatus.OK, HttpStatus.ACCEPTED])) {
             def errorMsg = "${responseEntity.body}"
             //logger.error(errorMsg)
             if (HttpStatus.NOT_FOUND == statusCode) {
