@@ -20,7 +20,7 @@ class User {
     String phone2
     String companyName
     String companyPhone
-    String logo
+    String companyLogo
 
     def getPermissions() {
         def permissions
@@ -106,7 +106,7 @@ class User {
             phone2:number2,
             companyName:"${companyData?.first_name} ${companyData?.last_name}",
             companyPhone:companyPhone,
-            logo:companyData?.logo
+            companyLogo:companyData?.logo
         )
     }
 
