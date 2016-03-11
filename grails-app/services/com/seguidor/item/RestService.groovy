@@ -9,6 +9,7 @@ import meli.exceptions.NotFoundException
 import meli.exceptions.ForbiddenException
 import meli.exceptions.UnauthorizedException
 import org.apache.log4j.Logger
+import org.apache.tools.ant.taskdefs.condition.Http
 import org.grails.web.json.JSONElement
 import org.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
@@ -28,7 +29,7 @@ trait RestService {
     RestBuilder restBuilder = Holders.grailsApplication.getMainContext().getBean('restBuilder')
     String baseURL = Holders.grailsApplication.config.getProperty('grails.serverURL')
     public init(){
-
+        this.restBuilder.restTemplate.setMessageConverters([new StringHttpMessageConverter(Charset.defaultCharset.forName("UTF-8"))])
     }
     JSONElement getResource(String url) {
         def response = restBuilder.get("${baseURL}${url}")
@@ -38,7 +39,6 @@ trait RestService {
     }
 
     JSONElement postResource(String url, JSONObject objectParam) {
-        this.restBuilder.restTemplate.setMessageConverters([new StringHttpMessageConverter(Charset.defaultCharset.forName("UTF-8"))])
         url = "${baseURL}${url}"
         def response = restBuilder.post(url) {
             json objectParam.toString()
@@ -62,7 +62,8 @@ trait RestService {
     {
         url = "${baseURL}${url}"
         def response =  restBuilder.put(url){
-            json objectParam
+            json objectParam.toString()
+            header('Content-Type',' application/json;charset=UTF-8')
         }
         handleResponse(response.responseEntity)
         log.info("Returning" + url + " info: " + response.responseEntity.body )
@@ -71,7 +72,7 @@ trait RestService {
 
     def handleResponse(ResponseEntity responseEntity) {
         def statusCode =  responseEntity.statusCode
-        if (!(statusCode in [HttpStatus.OK, HttpStatus.ACCEPTED])) {
+        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             def errorMsg = "${responseEntity.body}"
             //logger.error(errorMsg)
             if (HttpStatus.NOT_FOUND == statusCode) {

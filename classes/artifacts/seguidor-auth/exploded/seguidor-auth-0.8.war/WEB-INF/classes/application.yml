@@ -13,6 +13,13 @@ spring:
         template:
             check-template-location: false
 ---
+grails.cache.enabled: true
+grails.cache.clearAtStartup: true
+grails.cache.config:
+    cache:
+        - name: users
+          maxElementsInMemory: 1000
+---
 grails:
     mime:
         disable:
