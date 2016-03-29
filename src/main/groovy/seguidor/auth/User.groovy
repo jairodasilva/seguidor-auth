@@ -36,7 +36,8 @@ class User {
                         publishItem    : true,
                         stopItem       : true,
                         finishItem     : true,
-                        questionsItems : true
+                        questionsItems : true,
+                        assigneUser    : true
                 ]
                 break
             case 'director':
@@ -50,7 +51,8 @@ class User {
                         publishItem    : true,
                         stopItem       : true,
                         finishItem     : true,
-                        questionsItems : true
+                        questionsItems : true,
+                        assigneUser    : false
                 ]
                 break
             case 'assistant':
@@ -64,7 +66,8 @@ class User {
                         publishItem    : true,
                         stopItem       : true,
                         finishItem     : true,
-                        questionsItems : true
+                        questionsItems : true,
+                        assigneUser    : false
                 ]
                 break
             case 'agent':
@@ -78,7 +81,8 @@ class User {
                         publishItem    : false,
                         stopItem       : false,
                         finishItem     : false,
-                        questionsItems : true
+                        questionsItems : true,
+                        assigneUser    : false
                 ]
                 break
         }
