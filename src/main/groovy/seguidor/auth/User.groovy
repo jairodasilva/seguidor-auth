@@ -27,62 +27,62 @@ class User {
         switch (this.role.toString()) {
             case 'admin':
                 permissions = [
-                        searchCommunity: true,
-                        searchInventory: true,
-                        showItem       : true,
-                        deleteItem     : true,
-                        addItem        : true,
-                        updateItem     : true,
-                        publishItem    : true,
-                        stopItem       : true,
-                        finishItem     : true,
-                        questionsItems : true,
-                        assigneUser    : true
+                    searchCommunity: true,
+                    searchInventory: true,
+                    showItem       : true,
+                    deleteItem     : true,
+                    addItem        : true,
+                    updateItem     : true,
+                    publishItem    : true,
+                    stopItem       : true,
+                    finishItem     : true,
+                    questionsItems : true,
+                    assigneUser    : true
                 ]
                 break
             case 'director':
                 permissions = [
-                        searchCommunity: true,
-                        searchInventory: true,
-                        showItem       : true,
-                        deleteItem     : true,
-                        addItem        : true,
-                        updateItem     : true,
-                        publishItem    : true,
-                        stopItem       : true,
-                        finishItem     : true,
-                        questionsItems : true,
-                        assigneUser    : false
+                    searchCommunity: true,
+                    searchInventory: true,
+                    showItem       : true,
+                    deleteItem     : true,
+                    addItem        : true,
+                    updateItem     : true,
+                    publishItem    : true,
+                    stopItem       : true,
+                    finishItem     : true,
+                    questionsItems : true,
+                    assigneUser    : true
                 ]
                 break
             case 'assistant':
                 permissions = [
-                        searchCommunity: true,
-                        searchInventory: true,
-                        showItem       : true,
-                        deleteItem     : true,
-                        addItem        : true,
-                        updateItem     : true,
-                        publishItem    : true,
-                        stopItem       : true,
-                        finishItem     : true,
-                        questionsItems : true,
-                        assigneUser    : false
+                    searchCommunity: true,
+                    searchInventory: true,
+                    showItem       : true,
+                    deleteItem     : true,
+                    addItem        : true,
+                    updateItem     : true,
+                    publishItem    : true,
+                    stopItem       : true,
+                    finishItem     : true,
+                    questionsItems : true,
+                    assigneUser    : true
                 ]
                 break
             case 'agent':
                 permissions = [
-                        searchCommunity: true,
-                        searchInventory: true,
-                        showItem       : true,
-                        deleteItem     : false,
-                        addItem        : true,
-                        updateItem     : false,
-                        publishItem    : false,
-                        stopItem       : false,
-                        finishItem     : false,
-                        questionsItems : true,
-                        assigneUser    : false
+                    searchCommunity: true,
+                    searchInventory: true,
+                    showItem       : true,
+                    deleteItem     : false,
+                    addItem        : true,
+                    updateItem     : false,
+                    publishItem    : false,
+                    stopItem       : false,
+                    finishItem     : false,
+                    questionsItems : true,
+                    assigneUser    : true
                 ]
                 break
         }
