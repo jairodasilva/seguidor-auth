@@ -19,3 +19,4 @@ trait AuthService implements RestService {
         getResource("seguidor/companies/${companyId}?caller.id=${companyId}")
     }
 }
+
