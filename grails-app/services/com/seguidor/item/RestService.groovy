@@ -26,7 +26,7 @@ trait RestService {
 
     private static final Logger log = Logger.getLogger(getClass())
 
-    RestBuilder restBuilder = new RestBuilder()
+    RestBuilder restBuilder = Holders.grailsApplication.getMainContext().getBean('restBuilder')
     String baseURL = Holders.grailsApplication.config.getProperty('grails.serverURL')
     public init(){
         this.restBuilder.restTemplate.setMessageConverters([new StringHttpMessageConverter(Charset.defaultCharset.forName("UTF-8"))])

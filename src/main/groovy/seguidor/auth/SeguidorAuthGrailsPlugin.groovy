@@ -41,8 +41,8 @@ Brief summary/description of the plugin.
 //    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
 
     Closure doWithSpring() { {->
-            // TODO Implement runtime spring config (optional)
-        }
+        // TODO Implement runtime spring config (optional)
+    }
     }
 
     void doWithDynamicMethods() {
