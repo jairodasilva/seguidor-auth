@@ -21,7 +21,7 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-version "0.12"
+version "0.16"
 group "org.grails.plugins"
 
 
@@ -79,6 +79,7 @@ dependencies {
     console "org.grails:grails-console"
     compile "org.grails.plugins:cache"
     compile 'org.grails:grails-datastore-rest-client:5.0.0.RC2'
+    compile "org.grails.plugins:newrelic:3.19.2"
 }
 
 task wrapper(type: Wrapper) {
