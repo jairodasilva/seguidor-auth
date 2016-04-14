@@ -33,7 +33,7 @@ trait RestService {
     }
     JSONElement getResource(String url) {
         def response = restBuilder.get("${baseURL}${url}")
-        handleResponse(response.responseEntity)
+        handleResponse(response.responseEntity, url)
         log.info("Returning" + url + " info: " + response.responseEntity.body )
         return JSON.parse(response.responseEntity.body.toString())
     }
@@ -44,7 +44,7 @@ trait RestService {
             json objectParam.toString()
             header('Content-Type',' application/json;charset=UTF-8')
         }
-        handleResponse(response.responseEntity)
+        handleResponse(response.responseEntity, url)
         return JSON.parse(response.responseEntity.body.toString())
     }
 
@@ -54,7 +54,7 @@ trait RestService {
             contentType('application/x-www-form-urlencoded')
             body(objectParam.toString())
         }
-        handleResponse(response.responseEntity)
+        handleResponse(response.responseEntity, url)
         return JSON.parse(response.responseEntity.body.toString())
     }
 
@@ -65,31 +65,44 @@ trait RestService {
             json objectParam.toString()
             header('Content-Type',' application/json;charset=UTF-8')
         }
-        handleResponse(response.responseEntity)
+        handleResponse(response.responseEntity, url)
         log.info("Returning" + url + " info: " + response.responseEntity.body )
         return JSON.parse(response.responseEntity.body.toString())
     }
 
+    // TODO Deprecar
     def handleResponse(ResponseEntity responseEntity) {
         def statusCode =  responseEntity.statusCode
         if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             def errorMsg = "${responseEntity.body}"
-            //logger.error(errorMsg)
             if (HttpStatus.NOT_FOUND == statusCode) {
-                //logger.error(errorMsg)
                 throw new NotFoundException(errorMsg)
             } else if (HttpStatus.BAD_REQUEST == statusCode) {
-                //logger.error(errorMsg)
                 throw new BadRequestException(errorMsg)
             } else if (HttpStatus.FORBIDDEN == statusCode) {
-                //logger.error(errorMsg)
                 throw new ForbiddenException(errorMsg)
             } else if (HttpStatus.UNAUTHORIZED == statusCode) {
-                //logger.error(errorMsg)
                 throw new UnauthorizedException(errorMsg)
             } else {
-                //logger.error(errorMsg)
                 throw new MercadoLibreAPIException(errorMsg)
+            }
+        }
+    }
+
+    def handleResponse(ResponseEntity responseEntity, String url) {
+        def statusCode =  responseEntity.statusCode
+        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
+            def errorMsg = "${responseEntity.body}"
+            if (HttpStatus.NOT_FOUND == statusCode) {
+                throw new NotFoundException(errorMsg, url)
+            } else if (HttpStatus.BAD_REQUEST == statusCode) {
+                throw new BadRequestException(errorMsg, url)
+            } else if (HttpStatus.FORBIDDEN == statusCode) {
+                throw new ForbiddenException(errorMsg, url)
+            } else if (HttpStatus.UNAUTHORIZED == statusCode) {
+                throw new UnauthorizedException(errorMsg, url)
+            } else {
+                throw new MercadoLibreAPIException(errorMsg, url, [])
             }
         }
     }
