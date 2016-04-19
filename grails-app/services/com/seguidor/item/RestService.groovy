@@ -7,12 +7,16 @@ import meli.exceptions.MercadoLibreAPIException
 import meli.exceptions.NotFoundException
 import meli.exceptions.ForbiddenException
 import meli.exceptions.UnauthorizedException
-import org.apache.log4j.Logger
 import com.mercadolibre.opensource.frameworks.restclient.RestClient
-import org.springframework.http.HttpStatus
-import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
+import org.apache.log4j.Logger
+import org.grails.web.json.JSONElement
+import org.grails.web.json.JSONObject
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 
+
+import java.nio.charset.Charset
 /**
  * Common service options
  *
@@ -122,7 +126,7 @@ trait RestService {
         if(!response?.status || !response?.data){
             throw new MercadoLibreAPIException(errorMsg.toString())
         }
-        this.handleError(Integer.valueOf((response?.status?.statusCode)?:500), errorMsg.toString())
+        this.handleError(Integer.valueOf((response?.status?.statusCode)?:500), errorMsg.toString(), uri)
         if (response.exception) {
             throw response.exception
         } else {
@@ -130,22 +134,26 @@ trait RestService {
         }
     }
 
-    def handleError(Integer code, String errorMessage) {
+    def getErrorMessage(error, url) {
+        return "${error} [Url: ${url}]"
+    }
+
+    def handleError(Integer code, String errorMessage, String url) {
         HttpStatus statusCode = HttpStatus.valueOf(code)
         if (!(statusCode in [HttpStatus.OK, HttpStatus.ACCEPTED])) {
             switch (statusCode) {
                 case HttpStatus.NOT_FOUND:
-                    throw new NotFoundException(errorMessage)
+                    throw new NotFoundException(getErrorMessage(errorMessage,url))
                 case HttpStatus.BAD_REQUEST:
-                    throw new BadRequestException(errorMessage)
+                    throw new BadRequestException(getErrorMessage(errorMessage,url))
                 case HttpStatus.FORBIDDEN:
-                    throw new ForbiddenException(errorMessage)
+                    throw new ForbiddenException(getErrorMessage(errorMessage,url))
                 case HttpStatus.UNAUTHORIZED:
-                    throw new UnauthorizedException(errorMessage)
+                    throw new UnauthorizedException(getErrorMessage(errorMessage,url))
                 case HttpStatus.CONFLICT:
-                    throw new ConflictException(errorMessage)
+                    throw new ConflictException(getErrorMessage(errorMessage,url))
                 default:
-                    throw new MercadoLibreAPIException(errorMessage)
+                    throw new MercadoLibreAPIException(getErrorMessage(errorMessage,url))
             }
         }
     }
