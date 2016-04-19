@@ -1,7 +1,5 @@
 package seguidor.auth
 
-import org.grails.web.json.JSONElement
-
 @SuppressWarnings(['SpaceAroundMapEntryColon'])
 class User {
 
@@ -88,7 +86,7 @@ class User {
         }
     }
 
-    static User buildUser(JSONElement userData, JSONElement companyData) {
+    static User buildUser(userData, companyData) {
         def areaCode = (userData.containsKey('phone') && userData.get('phone').containsKey('area_code')) ? userData.get('phone').get('area_code') : ''
         def number = (userData.containsKey('phone') && userData.get('phone').containsKey('number')) ? userData.get('phone').get('number') : ''
         def area_code2 = (userData.containsKey('alternative_phone') && userData.get('alternative_phone').containsKey('area_code')) ? userData.get('alternative_phone').get('area_code') : ''

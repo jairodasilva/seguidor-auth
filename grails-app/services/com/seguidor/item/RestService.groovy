@@ -1,21 +1,17 @@
 package com.seguidor.item
 
 import grails.converters.JSON
-import grails.plugins.rest.client.RestBuilder
-import grails.util.Holders
 import meli.exceptions.BadRequestException
+import meli.exceptions.ConflictException
 import meli.exceptions.MercadoLibreAPIException
 import meli.exceptions.NotFoundException
 import meli.exceptions.ForbiddenException
 import meli.exceptions.UnauthorizedException
 import org.apache.log4j.Logger
-import org.apache.tools.ant.taskdefs.condition.Http
-import org.grails.web.json.JSONElement
-import org.grails.web.json.JSONObject
+import com.mercadolibre.opensource.frameworks.restclient.RestClient
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.http.converter.StringHttpMessageConverter
-import java.nio.charset.Charset
+import org.grails.web.json.JSONObject
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Common service options
@@ -23,74 +19,154 @@ import java.nio.charset.Charset
  * @author Camilo Verdugo
  */
 trait RestService {
-
     private static final Logger log = Logger.getLogger(getClass())
 
-    RestBuilder restBuilder = Holders.grailsApplication.getMainContext().getBean('restBuilder')
-    String baseURL = Holders.grailsApplication.config.getProperty('grails.serverURL')
-    public init(){
-        this.restBuilder.restTemplate.setMessageConverters([new StringHttpMessageConverter(Charset.defaultCharset.forName("UTF-8"))])
-    }
-    JSONElement getResource(String url) {
-        def response = restBuilder.get("${baseURL}${url}")
-        handleResponse(response.responseEntity)
-        log.info("Returning" + url + " info: " + response.responseEntity.body )
-        return JSON.parse(response.responseEntity.body.toString())
-    }
+    @Autowired
+    RestClient restClient
 
-    JSONElement postResource(String url, JSONObject objectParam) {
-        url = "${baseURL}${url}"
-        def response = restBuilder.post(url) {
-            json objectParam.toString()
-            header('Content-Type',' application/json;charset=UTF-8')
+    def getResource(String url){
+        if(!url.startsWith('/')) {
+            url = '/' + url
         }
-        handleResponse(response.responseEntity)
-        return JSON.parse(response.responseEntity.body.toString())
+
+        def inicio = new Date()
+        def info
+        log.info("Getting url: "+url)
+        restClient.toString()
+
+        restClient.get(uri: "${url}".toString(),
+                success: {
+                    info = it.data
+                },
+                failure: {
+                    onFailure(url, 'GET', [], it)
+                }
+        )
+        def fin = new Date()
+        log.info("Returning get ${url}: ${inicio} - ${fin}: ${(fin.getTime() - inicio.getTime())}")
+        log.debug("Returning  ${url}. Info: ${info}")
+
+        convertJsonNulltoPrimitiveNull(info)
+        info
     }
 
-    JSONElement postResource(String url, String objectParam) {
-        url = "${baseURL}${url}"
-        def response = restBuilder.post(url) {
-            contentType('application/x-www-form-urlencoded')
-            body(objectParam.toString())
+    def postResource(String uri, jsonData) {
+        def inicio = new Date()
+        def jsonResult
+        log.info "About to POST to URI: '${uri}', Data: ${jsonData as JSON}"
+        restClient.post(uri: uri.toString(),
+                data: jsonData,
+                headers: [ "Encoding" : "UTF-8"],
+                success: {
+                    jsonResult = it.data
+                },
+                failure: {
+                    onFailure(uri, 'POST', jsonData, it)
+                })
+
+        def fin = new Date()
+        log.info("Returning post ${uri}: ${inicio} - ${fin}: ${(fin.getTime() - inicio.getTime())}")
+        log.info("jsonResult: " + jsonResult)
+
+        convertJsonNulltoPrimitiveNull(jsonResult)
+        jsonResult
+    }
+
+    def deleteResource(String uri) {
+        def inicio = new Date()
+        def jsonResult
+        log.info "About to DELETE to URI: '${uri}'"
+        restClient.delete(uri: uri.toString(),
+                headers: [ "Encoding" : "UTF-8"],
+                success: {
+                    jsonResult = it.data
+                },
+                failure: {
+                    onFailure(uri, 'DELETE', [], it)
+                })
+
+        def fin = new Date()
+        log.info("Returning post ${uri}: ${inicio} - ${fin}: ${(fin.getTime() - inicio.getTime())}")
+        log.info("jsonResult: " + jsonResult)
+
+        convertJsonNulltoPrimitiveNull(jsonResult)
+        jsonResult
+    }
+
+    def putResource(String uri, jsonData) {
+        def inicio = new Date()
+        def jsonResult
+        log.info "About to PUT to URI: '${uri}', Data: ${jsonData as JSON}"
+        restClient.put(uri: uri.toString(),
+                data: jsonData,
+                headers: [ "Encoding" : "UTF-8"],
+                success: {
+                    jsonResult = it.data
+                },
+                failure: {
+                    onFailure(uri, 'PUT', jsonData, it)
+                })
+
+        def fin = new Date()
+        log.info("Returning put ${uri}: ${inicio} - ${fin}: ${(fin.getTime() - inicio.getTime())}")
+        log.info("jsonResult: " + jsonResult)
+
+        convertJsonNulltoPrimitiveNull(jsonResult)
+        jsonResult
+    }
+
+    void onFailure(uri, verb, jsonData, response) {
+        def errorMsg = "Error on ${verb} to URI: [${uri}], Data: ${jsonData as JSON}, StatusCode: [${response?.status?.statusCode}], Reason: ${response?.data?.toString()}\n"
+
+        log.error(errorMsg)
+        if(!response?.status || !response?.data){
+            throw new MercadoLibreAPIException(errorMsg.toString())
         }
-        handleResponse(response.responseEntity)
-        return JSON.parse(response.responseEntity.body.toString())
-    }
-
-    JSONElement putResource(String url, JSONObject objectParam)
-    {
-        url = "${baseURL}${url}"
-        def response =  restBuilder.put(url){
-            json objectParam.toString()
-            header('Content-Type',' application/json;charset=UTF-8')
+        this.handleError(Integer.valueOf((response?.status?.statusCode)?:500), errorMsg.toString())
+        if (response.exception) {
+            throw response.exception
+        } else {
+            throw new RuntimeException(errorMsg)
         }
-        handleResponse(response.responseEntity)
-        log.info("Returning" + url + " info: " + response.responseEntity.body )
-        return JSON.parse(response.responseEntity.body.toString())
     }
 
-    def handleResponse(ResponseEntity responseEntity) {
-        def statusCode =  responseEntity.statusCode
-        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
-            def errorMsg = "${responseEntity.body}"
-            //logger.error(errorMsg)
-            if (HttpStatus.NOT_FOUND == statusCode) {
-                //logger.error(errorMsg)
-                throw new NotFoundException(errorMsg)
-            } else if (HttpStatus.BAD_REQUEST == statusCode) {
-                //logger.error(errorMsg)
-                throw new BadRequestException(errorMsg)
-            } else if (HttpStatus.FORBIDDEN == statusCode) {
-                //logger.error(errorMsg)
-                throw new ForbiddenException(errorMsg)
-            } else if (HttpStatus.UNAUTHORIZED == statusCode) {
-                //logger.error(errorMsg)
-                throw new UnauthorizedException(errorMsg)
-            } else {
-                //logger.error(errorMsg)
-                throw new MercadoLibreAPIException(errorMsg)
+    def handleError(Integer code, String errorMessage) {
+        HttpStatus statusCode = HttpStatus.valueOf(code)
+        if (!(statusCode in [HttpStatus.OK, HttpStatus.ACCEPTED])) {
+            switch (statusCode) {
+                case HttpStatus.NOT_FOUND:
+                    throw new NotFoundException(errorMessage)
+                case HttpStatus.BAD_REQUEST:
+                    throw new BadRequestException(errorMessage)
+                case HttpStatus.FORBIDDEN:
+                    throw new ForbiddenException(errorMessage)
+                case HttpStatus.UNAUTHORIZED:
+                    throw new UnauthorizedException(errorMessage)
+                case HttpStatus.CONFLICT:
+                    throw new ConflictException(errorMessage)
+                default:
+                    throw new MercadoLibreAPIException(errorMessage)
             }
         }
+    }
+
+    def convertJsonNulltoPrimitiveNull(object) {
+        if (object instanceof Collection) {
+            object.each {
+                convertJsonNulltoPrimitiveNull(it)
+            }
+        }
+
+        if (object instanceof Map) {
+            for (tuple in object) {
+                if (tuple.value.getClass() == net.sf.json.JSONNull || net.sf.json.JSONNull.instance == tuple.value || JSONObject.NULL == tuple.value) {
+                    tuple.value = null
+                } else if(tuple.value instanceof Map || tuple.value instanceof Collection) {
+                    convertJsonNulltoPrimitiveNull(tuple.value)
+                }
+
+            }
+        }
+        object
     }
 }
