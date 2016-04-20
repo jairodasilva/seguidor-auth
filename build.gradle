@@ -21,7 +21,8 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-version "0.17"
+version "0.18"
+
 group "org.grails.plugins"
 
 
@@ -79,6 +80,14 @@ dependencies {
     console "org.grails:grails-console"
     compile "org.grails.plugins:cache"
     compile 'org.grails:grails-datastore-rest-client:5.0.0.RC2'
+
+    compile 'org.apache.httpcomponents:httpclient:4.5.2'
+    compile name:'restclient-1.1.10'
+    compile name:"json-lib-2.3"
+    compile name:"utilities-0.1.2"
+    compile name:"javadog-0.0.9"
+    compile name:"fasthttpclient-0.3.22"
+
     compile "org.grails.plugins:newrelic:3.19.2"
 }
 
