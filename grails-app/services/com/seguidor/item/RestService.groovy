@@ -123,7 +123,7 @@ trait RestService {
         def errorMsg = "Error on ${verb} to URI: [${uri}], Data: ${jsonData as JSON}, StatusCode: [${response?.status?.statusCode}], Reason: ${response?.data?.toString()}\n"
 
         log.error(errorMsg)
-        if(!response?.status || !response?.data){
+        if(!response?.status){
             throw new MercadoLibreAPIException(errorMsg.toString())
         }
         this.handleError(Integer.valueOf((response?.status?.statusCode)?:500), errorMsg.toString(), uri)
@@ -140,7 +140,7 @@ trait RestService {
 
     def handleError(Integer code, String errorMessage, String url) {
         HttpStatus statusCode = HttpStatus.valueOf(code)
-        if (!(statusCode in [HttpStatus.OK, HttpStatus.ACCEPTED])) {
+        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             switch (statusCode) {
                 case HttpStatus.NOT_FOUND:
                     throw new NotFoundException(getErrorMessage(errorMessage,url))
