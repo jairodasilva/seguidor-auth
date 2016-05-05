@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.grails.web.converters.exceptions.ConverterException
-
 import java.nio.charset.Charset
 /**
  * Common service options
@@ -87,6 +86,8 @@ trait RestService {
                 throw new ForbiddenException(errorMsg)
             } else if (HttpStatus.UNAUTHORIZED == statusCode) {
                 throw new UnauthorizedException(errorMsg)
+            } else if (HttpStatus.CONFLICT == statusCode) {
+                throw new ConflictException(errorMsg)
             } else {
                 throw new MercadoLibreAPIException(errorMsg)
             }
@@ -106,6 +107,8 @@ trait RestService {
                 throw new ForbiddenException(errorMsg, url)
             } else if (HttpStatus.UNAUTHORIZED == statusCode) {
                 throw new UnauthorizedException(errorMsg, url)
+            } else if (HttpStatus.CONFLICT == statusCode) {
+                throw new ConflictException(errorMsg, url)
             } else {
                 throw new MercadoLibreAPIException(errorMsg, url, [])
             }
