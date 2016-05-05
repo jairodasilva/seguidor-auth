@@ -76,7 +76,7 @@ trait RestService {
     // TODO Deprecar
     def handleResponse(ResponseEntity responseEntity) {
         def statusCode =  responseEntity.statusCode
-        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
+        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT, HttpStatus.CONFLICT])) {
             def errorMsg = "${responseEntity.body}"
             log.error("Url: " + url + " error: " + responseEntity.toString() )
             if (HttpStatus.NOT_FOUND == statusCode) {
@@ -87,8 +87,6 @@ trait RestService {
                 throw new ForbiddenException(errorMsg)
             } else if (HttpStatus.UNAUTHORIZED == statusCode) {
                 throw new UnauthorizedException(errorMsg)
-            } else if (HttpStatus.CONFLICT == statusCode) {
-                throw new ConflictException(errorMsg)
             } else {
                 throw new MercadoLibreAPIException(errorMsg)
             }
@@ -97,7 +95,7 @@ trait RestService {
 
     def handleResponse(ResponseEntity responseEntity, String url) {
         def statusCode =  responseEntity.statusCode
-        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
+        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT, HttpStatus.CONFLICT])) {
             def errorMsg = "${responseEntity.body}"
             log.error("Url: " + url + " error: " + responseEntity.toString() )
             if (HttpStatus.NOT_FOUND == statusCode) {
@@ -108,8 +106,6 @@ trait RestService {
                 throw new ForbiddenException(errorMsg, url)
             } else if (HttpStatus.UNAUTHORIZED == statusCode) {
                 throw new UnauthorizedException(errorMsg, url)
-            }else if (HttpStatus.CONFLICT == statusCode) {
-                    throw new ConflictException(errorMsg, url)
             } else {
                 throw new MercadoLibreAPIException(errorMsg, url, [])
             }
