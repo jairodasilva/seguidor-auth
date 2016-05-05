@@ -28,18 +28,18 @@ trait RestService {
         this.restBuilder.restTemplate.setMessageConverters([new StringHttpMessageConverter(Charset.defaultCharset.forName("UTF-8"))])
     }
 
-    JSON handleParsing(response){
+    JSONElement handleParsing(response, url){
         try{
             return JSON.parse(response.responseEntity?.body?.toString())
         } catch(ConverterException e){
-            throw new MercadoLibreAPIException(response.responseEntity.body, "error parsing json", [])
+            throw new MercadoLibreAPIException("Url: "+ url +" detail: "+response.responseEntity.toString(), "error parsing json", [])
         }
     }
 
     JSONElement getResource(String url) {
         def response = restBuilder.get("${baseURL}${url}")
         handleResponse(response.responseEntity, url)
-        handleParsing(response)
+        handleParsing(response, url)
     }
 
     JSONElement postResource(String url, JSONObject objectParam) {
@@ -49,7 +49,7 @@ trait RestService {
             header('Content-Type',' application/json;charset=UTF-8')
         }
         handleResponse(response.responseEntity, url)
-        handleParsing(response)
+        handleParsing(response, url)
     }
 
     JSONElement postResource(String url, String objectParam) {
@@ -59,7 +59,7 @@ trait RestService {
             body(objectParam.toString())
         }
         handleResponse(response.responseEntity, url)
-        handleParsing(response)
+        handleParsing(response, url)
     }
 
     JSONElement putResource(String url, JSONObject objectParam)
@@ -70,7 +70,7 @@ trait RestService {
             header('Content-Type',' application/json;charset=UTF-8')
         }
         handleResponse(response.responseEntity, url)
-        handleParsing(response)
+        handleParsing(response, url)
     }
 
     // TODO Deprecar
@@ -78,7 +78,7 @@ trait RestService {
         def statusCode =  responseEntity.statusCode
         if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             def errorMsg = "${responseEntity.body}"
-            log.error("Returning" + url + " error: " + errorMsg )
+            log.error("Url: " + url + " error: " + responseEntity.toString() )
             if (HttpStatus.NOT_FOUND == statusCode) {
                 throw new NotFoundException(errorMsg)
             } else if (HttpStatus.BAD_REQUEST == statusCode) {
@@ -99,7 +99,7 @@ trait RestService {
         def statusCode =  responseEntity.statusCode
         if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             def errorMsg = "${responseEntity.body}"
-            log.error("Returning" + url + " error: " + errorMsg )
+            log.error("Url: " + url + " error: " + responseEntity.toString() )
             if (HttpStatus.NOT_FOUND == statusCode) {
                 throw new NotFoundException(errorMsg, url)
             } else if (HttpStatus.BAD_REQUEST == statusCode) {
