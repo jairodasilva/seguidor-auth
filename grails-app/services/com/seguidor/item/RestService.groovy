@@ -76,7 +76,7 @@ trait RestService {
     // TODO Deprecar
     def handleResponse(ResponseEntity responseEntity) {
         def statusCode =  responseEntity.statusCode
-        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT, HttpStatus.CONFLICT])) {
+        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             def errorMsg = "${responseEntity.body}"
             log.error("Url: " + url + " error: " + responseEntity.toString() )
             if (HttpStatus.NOT_FOUND == statusCode) {
@@ -95,7 +95,7 @@ trait RestService {
 
     def handleResponse(ResponseEntity responseEntity, String url) {
         def statusCode =  responseEntity.statusCode
-        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT, HttpStatus.CONFLICT])) {
+        if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             def errorMsg = "${responseEntity.body}"
             log.error("Url: " + url + " error: " + responseEntity.toString() )
             if (HttpStatus.NOT_FOUND == statusCode) {
