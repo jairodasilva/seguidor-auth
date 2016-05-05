@@ -72,12 +72,20 @@ trait RestService {
         handleParsing(response, url)
     }
 
-    // TODO Deprecar
+    JSONElement deleteResource(String url)
+    {
+        url = "${baseURL}${url}"
+        def response =  restBuilder.delete(url)
+        handleResponse(response.responseEntity, url)
+        handleParsing(response, url)
+    }
+
+    @Deprecated
     def handleResponse(ResponseEntity responseEntity) {
         def statusCode =  responseEntity.statusCode
         if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             def errorMsg = "${responseEntity.body}"
-            log.error("Url: " + url + " error: " + responseEntity.toString() )
+            log.error(" error: " + responseEntity.toString() )
             if (HttpStatus.NOT_FOUND == statusCode) {
                 throw new NotFoundException(errorMsg)
             } else if (HttpStatus.BAD_REQUEST == statusCode) {
