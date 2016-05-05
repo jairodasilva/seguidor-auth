@@ -10,6 +10,7 @@ import org.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.StringHttpMessageConverter
+import org.grails.web.converters.exceptions.ConverterException
 
 import java.nio.charset.Charset
 /**
@@ -26,11 +27,19 @@ trait RestService {
     public init(){
         this.restBuilder.restTemplate.setMessageConverters([new StringHttpMessageConverter(Charset.defaultCharset.forName("UTF-8"))])
     }
+
+    JSON handleParsing(response){
+        try{
+            return JSON.parse(response.responseEntity?.body?.toString())
+        } catch(ConverterException e){
+            throw new MercadoLibreAPIException(response.responseEntity.body, "error parsing json", [])
+        }
+    }
+
     JSONElement getResource(String url) {
         def response = restBuilder.get("${baseURL}${url}")
         handleResponse(response.responseEntity, url)
-        log.info("Returning" + url + " info: " + response.responseEntity.body )
-        return JSON.parse(response.responseEntity.body.toString())
+        handleParsing(response)
     }
 
     JSONElement postResource(String url, JSONObject objectParam) {
@@ -40,7 +49,7 @@ trait RestService {
             header('Content-Type',' application/json;charset=UTF-8')
         }
         handleResponse(response.responseEntity, url)
-        return JSON.parse(response.responseEntity.body.toString())
+        handleParsing(response)
     }
 
     JSONElement postResource(String url, String objectParam) {
@@ -50,7 +59,7 @@ trait RestService {
             body(objectParam.toString())
         }
         handleResponse(response.responseEntity, url)
-        return JSON.parse(response.responseEntity.body.toString())
+        handleParsing(response)
     }
 
     JSONElement putResource(String url, JSONObject objectParam)
@@ -61,8 +70,7 @@ trait RestService {
             header('Content-Type',' application/json;charset=UTF-8')
         }
         handleResponse(response.responseEntity, url)
-        log.info("Returning" + url + " info: " + response.responseEntity.body )
-        return JSON.parse(response.responseEntity.body.toString())
+        handleParsing(response)
     }
 
     // TODO Deprecar
@@ -70,6 +78,7 @@ trait RestService {
         def statusCode =  responseEntity.statusCode
         if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             def errorMsg = "${responseEntity.body}"
+            log.error("Returning" + url + " error: " + errorMsg )
             if (HttpStatus.NOT_FOUND == statusCode) {
                 throw new NotFoundException(errorMsg)
             } else if (HttpStatus.BAD_REQUEST == statusCode) {
@@ -90,6 +99,7 @@ trait RestService {
         def statusCode =  responseEntity.statusCode
         if (!(statusCode in [HttpStatus.ACCEPTED, HttpStatus.CREATED, HttpStatus.OK, HttpStatus.NO_CONTENT])) {
             def errorMsg = "${responseEntity.body}"
+            log.error("Returning" + url + " error: " + errorMsg )
             if (HttpStatus.NOT_FOUND == statusCode) {
                 throw new NotFoundException(errorMsg, url)
             } else if (HttpStatus.BAD_REQUEST == statusCode) {
