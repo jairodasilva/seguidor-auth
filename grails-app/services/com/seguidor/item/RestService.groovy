@@ -3,20 +3,15 @@ package com.seguidor.item
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.util.Holders
-import meli.exceptions.BadRequestException
-import meli.exceptions.MercadoLibreAPIException
-import meli.exceptions.NotFoundException
-import meli.exceptions.ForbiddenException
-import meli.exceptions.UnauthorizedException
+import meli.exceptions.*
 import org.apache.log4j.Logger
-import org.apache.tools.ant.taskdefs.condition.Http
 import org.grails.web.json.JSONElement
 import org.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.StringHttpMessageConverter
-import java.nio.charset.Charset
 
+import java.nio.charset.Charset
 /**
  * Common service options
  *
@@ -83,6 +78,8 @@ trait RestService {
                 throw new ForbiddenException(errorMsg)
             } else if (HttpStatus.UNAUTHORIZED == statusCode) {
                 throw new UnauthorizedException(errorMsg)
+            } else if (HttpStatus.CONFLICT == statusCode) {
+                throw new ConflictException(errorMsg)
             } else {
                 throw new MercadoLibreAPIException(errorMsg)
             }
@@ -101,6 +98,8 @@ trait RestService {
                 throw new ForbiddenException(errorMsg, url)
             } else if (HttpStatus.UNAUTHORIZED == statusCode) {
                 throw new UnauthorizedException(errorMsg, url)
+            }else if (HttpStatus.CONFLICT == statusCode) {
+                    throw new ConflictException(errorMsg, url)
             } else {
                 throw new MercadoLibreAPIException(errorMsg, url, [])
             }
