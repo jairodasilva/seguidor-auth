@@ -1,33 +1,39 @@
 package com.seguidor.item
 
 import meli.exceptions.NotFoundException
+import meli.exceptions.AuthException
 import seguidor.auth.User
 import com.newrelic.api.agent.NewRelic
 
 trait AuthService implements RestService {
 
     def getUser(callerId) {
-        def userBuild
-        try {
-            def user = getUserInfo(callerId)
-            def company
-            if (user?.company_id == null || user?.company_id == -1 || user?.company_id == 0){
-                throw new NotFoundException("Error getting company_id from user callerId: ${callerId}", "Error getting user")
-            }
-            company = getCompanyInfo(user?.company_id)
-            userBuild = User.buildUser(user, company)
-        } catch(Exception e) {
-            throw e
+        def user = getUserInfo(callerId)
+        def company
+        if (user?.company_id == null || user?.company_id == -1 || user?.company_id == 0){
+            throw new NotFoundException("Invalid company_id from user callerId: ${callerId}", "Invalid company_id of user")
         }
+        company = getCompanyInfo(user?.company_id)
+        def userBuild = User.buildUser(user, company)
         userBuild
     }
 
     private getUserInfo(callerId) {
-        getResource("seguidor/users/${callerId}?caller.id=${callerId}")
+        try{
+            getResource("seguidor/users/${callerId}?caller.id=${callerId}")
+        }catch (Exception e) {
+            throw new AuthException("Error getting user", e.message, [])
+        }
+
     }
 
     private getCompanyInfo(companyId) {
-        getResource("seguidor/companies/${companyId}?caller.id=${companyId}")
+        try{
+            getResource("seguidor/companies/${companyId}?caller.id=${companyId}")
+        }catch (Exception e) {
+            throw new AuthException("Error getting company", e.message, [])
+        }
+
     }
 }
 
