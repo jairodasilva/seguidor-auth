@@ -128,7 +128,7 @@ trait RestService {
     }
 
     void onFailure(uri, verb, jsonData, response) {
-        def errorMsg = "Error on ${verb} to URI: [${uri}], Data: ${jsonData as JSON}, StatusCode: [${response?.status?.statusCode}], Reason: ${response?.data?.toString()}\n"
+        def errorMsg = "Error on ${verb} to URI: [${uri}], StatusCode: [${response?.status?.statusCode}], Reason: ${response?.data?.toString()}\n"
 
         log.error(errorMsg)
         if(!response?.status){
