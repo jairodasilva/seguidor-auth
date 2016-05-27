@@ -10,13 +10,9 @@ import meli.exceptions.UnauthorizedException
 import com.mercadolibre.opensource.frameworks.restclient.RestClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.apache.log4j.Logger
-import org.grails.web.json.JSONElement
 import org.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 
-
-import java.nio.charset.Charset
 /**
  * Common service options
  *
@@ -55,6 +51,10 @@ trait RestService {
     }
 
     def postResource(String uri, jsonData) {
+        if(!uri.startsWith('/')) {
+            uri = '/' + uri
+        }
+
         def inicio = new Date()
         def jsonResult
         log.info "About to POST to URI: '${uri}', Data: ${jsonData as JSON}"
@@ -77,6 +77,10 @@ trait RestService {
     }
 
     def deleteResource(String uri) {
+        if(!uri.startsWith('/')) {
+            uri = '/' + uri
+        }
+
         def inicio = new Date()
         def jsonResult
         log.info "About to DELETE to URI: '${uri}'"
@@ -98,6 +102,10 @@ trait RestService {
     }
 
     def putResource(String uri, jsonData) {
+        if(!uri.startsWith('/')) {
+            uri = '/' + uri
+        }
+
         def inicio = new Date()
         def jsonResult
         log.info "About to PUT to URI: '${uri}', Data: ${jsonData as JSON}"
