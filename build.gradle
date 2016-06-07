@@ -21,11 +21,7 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-<<<<<<< HEAD
 version "0.18.1"
-=======
-version "0.18.2"
->>>>>>> origin/develop
 
 group "org.grails.plugins"
 
