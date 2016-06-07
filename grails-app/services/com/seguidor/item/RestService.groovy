@@ -51,6 +51,10 @@ trait RestService {
     }
 
     def postResource(String uri, jsonData) {
+        if(!uri.startsWith('/')) {
+            uri = '/' + uri
+        }
+
         def inicio = new Date()
         def jsonResult
         log.info "About to POST to URI: '${uri}', Data: ${jsonData as JSON}"
@@ -73,6 +77,10 @@ trait RestService {
     }
 
     def deleteResource(String uri) {
+        if(!uri.startsWith('/')) {
+            uri = '/' + uri
+        }
+
         def inicio = new Date()
         def jsonResult
         log.info "About to DELETE to URI: '${uri}'"
@@ -94,6 +102,10 @@ trait RestService {
     }
 
     def putResource(String uri, jsonData) {
+        if(!uri.startsWith('/')) {
+            uri = '/' + uri
+        }
+
         def inicio = new Date()
         def jsonResult
         log.info "About to PUT to URI: '${uri}', Data: ${jsonData as JSON}"
@@ -116,7 +128,7 @@ trait RestService {
     }
 
     void onFailure(uri, verb, jsonData, response) {
-        def errorMsg = "Error on ${verb} to URI: [${uri}], Data: ${jsonData as JSON}, StatusCode: [${response?.status?.statusCode}], Reason: ${response?.data?.toString()}\n"
+        def errorMsg = "Error on ${verb} to URI: [${uri}], StatusCode: [${response?.status?.statusCode}], Reason: ${response?.data?.toString()}\n"
 
         log.error(errorMsg)
         if(!response?.status){
