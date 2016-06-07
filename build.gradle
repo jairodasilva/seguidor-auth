@@ -21,7 +21,7 @@ plugins {
     id "com.jfrog.bintray" version "1.2"
 }
 
-version "0.18"
+version "0.18.1"
 
 group "org.grails.plugins"
 
@@ -75,7 +75,7 @@ dependencies {
 
     testCompile "org.grails:grails-plugin-testing"
 
-    compile name:"meli-exceptions-0.3.0"
+    compile name:"meli-exceptions-0.5.0"
 
     console "org.grails:grails-console"
     compile "org.grails.plugins:cache"

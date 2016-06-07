@@ -10,13 +10,9 @@ import meli.exceptions.UnauthorizedException
 import com.mercadolibre.opensource.frameworks.restclient.RestClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.apache.log4j.Logger
-import org.grails.web.json.JSONElement
 import org.grails.web.json.JSONObject
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 
-
-import java.nio.charset.Charset
 /**
  * Common service options
  *
@@ -177,4 +173,5 @@ trait RestService {
         }
         object
     }
+
 }
