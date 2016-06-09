@@ -55,9 +55,7 @@ trait RestService {
             uri = '/' + uri
         }
 
-        def inicio = new Date()
         def jsonResult
-        log.info "About to POST to URI: '${uri}', Data: ${jsonData as JSON}"
         restClient.post(uri: uri.toString(),
                 data: jsonData,
                 headers: [ "Encoding" : "UTF-8"],
@@ -68,10 +66,6 @@ trait RestService {
                     onFailure(uri, 'POST', jsonData, it)
                 })
 
-        def fin = new Date()
-        log.info("Returning post ${uri}: ${inicio} - ${fin}: ${(fin.getTime() - inicio.getTime())}")
-        log.info("jsonResult: " + jsonResult)
-
         convertJsonNulltoPrimitiveNull(jsonResult)
         jsonResult
     }
@@ -81,9 +75,7 @@ trait RestService {
             uri = '/' + uri
         }
 
-        def inicio = new Date()
         def jsonResult
-        log.info "About to DELETE to URI: '${uri}'"
         restClient.delete(uri: uri.toString(),
                 headers: [ "Encoding" : "UTF-8"],
                 success: {
@@ -92,10 +84,6 @@ trait RestService {
                 failure: {
                     onFailure(uri, 'DELETE', [], it)
                 })
-
-        def fin = new Date()
-        log.info("Returning post ${uri}: ${inicio} - ${fin}: ${(fin.getTime() - inicio.getTime())}")
-        log.info("jsonResult: " + jsonResult)
 
         convertJsonNulltoPrimitiveNull(jsonResult)
         jsonResult
@@ -106,9 +94,8 @@ trait RestService {
             uri = '/' + uri
         }
 
-        def inicio = new Date()
         def jsonResult
-        log.info "About to PUT to URI: '${uri}', Data: ${jsonData as JSON}"
+
         restClient.put(uri: uri.toString(),
                 data: jsonData,
                 headers: [ "Encoding" : "UTF-8"],
@@ -118,10 +105,6 @@ trait RestService {
                 failure: {
                     onFailure(uri, 'PUT', jsonData, it)
                 })
-
-        def fin = new Date()
-        log.info("Returning put ${uri}: ${inicio} - ${fin}: ${(fin.getTime() - inicio.getTime())}")
-        log.info("jsonResult: " + jsonResult)
 
         convertJsonNulltoPrimitiveNull(jsonResult)
         jsonResult
