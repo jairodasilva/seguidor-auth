@@ -29,10 +29,7 @@ trait RestService {
             url = '/' + url
         }
 
-        def inicio = new Date()
         def info
-        log.info("Getting url: "+url)
-        restClient.toString()
 
         restClient.get(uri: "${url}".toString(),
                 success: {
@@ -42,9 +39,6 @@ trait RestService {
                     onFailure(url, 'GET', [], it)
                 }
         )
-        def fin = new Date()
-        log.info("Returning get ${url}: ${inicio} - ${fin}: ${(fin.getTime() - inicio.getTime())}")
-        log.debug("Returning  ${url}. Info: ${info}")
 
         convertJsonNulltoPrimitiveNull(info)
         info
