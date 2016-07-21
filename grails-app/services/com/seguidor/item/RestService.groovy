@@ -1,18 +1,11 @@
 package com.seguidor.item
 
-import grails.converters.JSON
-import meli.exceptions.BadRequestException
-import meli.exceptions.ConflictException
-import meli.exceptions.MercadoLibreAPIException
-import meli.exceptions.NotFoundException
-import meli.exceptions.ForbiddenException
-import meli.exceptions.UnauthorizedException
 import com.mercadolibre.opensource.frameworks.restclient.RestClient
-import org.springframework.beans.factory.annotation.Autowired
+import meli.exceptions.*
 import org.apache.log4j.Logger
 import org.grails.web.json.JSONObject
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-
 /**
  * Common service options
  *
@@ -105,7 +98,9 @@ trait RestService {
     }
 
     void onFailure(uri, verb, jsonData, response) {
-        def errorMsg = "Error on ${verb} to URI: [${uri}], StatusCode: [${response?.status?.statusCode}], Reason: ${response?.data?.toString()}\n"
+        def reason = (response?.data)?response?.data?.toString():response?.exception?.cause
+        def errorMsg = "Error on ${verb} to URI: [${uri}], StatusCode: [${response?.status?.statusCode}], " +
+                "Reason: [${reason}]\n"
 
         log.error(errorMsg)
         if(!response?.status){
