@@ -1,11 +1,17 @@
 package com.seguidor.item
 
 import com.mercadolibre.opensource.frameworks.restclient.RestClient
-import meli.exceptions.*
+import meli.exceptions.BadRequestException
+import meli.exceptions.ConflictException
+import meli.exceptions.MercadoLibreAPIException
+import meli.exceptions.NotFoundException
+import meli.exceptions.ForbiddenException
+import meli.exceptions.UnauthorizedException
 import org.apache.log4j.Logger
 import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+
 /**
  * Common service options
  *
@@ -17,84 +23,74 @@ trait RestService {
     @Autowired
     RestClient restClient
 
-    def getResource(String url){
-        if(!url.startsWith('/')) {
-            url = '/' + url
-        }
+    def getResource(String uri){
+        uri = absolute(uri)
 
-        def info
-
-        restClient.get(uri: "${url}".toString(),
+        def result
+        restClient.get(uri: uri,
+                headers: headers(),
                 success: {
-                    info = it.data
+                    result = it.data
                 },
                 failure: {
-                    onFailure(url, 'GET', [], it)
+                    onFailure(uri, 'GET', [], it)
                 }
         )
 
-        convertJsonNulltoPrimitiveNull(info)
-        info
+        convertJsonNulltoPrimitiveNull(result)
     }
 
-    def postResource(String uri, jsonData) {
-        if(!uri.startsWith('/')) {
-            uri = '/' + uri
-        }
+    def postResource(String uri, data) {
+        uri = absolute(uri)
 
-        def jsonResult
-        restClient.post(uri: uri.toString(),
-                data: jsonData,
-                headers: [ "Encoding" : "UTF-8"],
+        def result
+        restClient.post(uri: uri,
+                data: data,
+                headers: headers(),
                 success: {
-                    jsonResult = it.data
+                    result = it.data
                 },
                 failure: {
-                    onFailure(uri, 'POST', jsonData, it)
-                })
+                    onFailure(uri, 'POST', data, it)
+                }
+        )
 
-        convertJsonNulltoPrimitiveNull(jsonResult)
-        jsonResult
+        convertJsonNulltoPrimitiveNull(result)
     }
 
     def deleteResource(String uri) {
-        if(!uri.startsWith('/')) {
-            uri = '/' + uri
-        }
+        uri = absolute(uri)
 
-        def jsonResult
-        restClient.delete(uri: uri.toString(),
-                headers: [ "Encoding" : "UTF-8"],
+        def result
+        restClient.delete(uri: uri,
+                headers: headers(),
                 success: {
-                    jsonResult = it.data
+                    result = it.data
                 },
                 failure: {
                     onFailure(uri, 'DELETE', [], it)
-                })
+                }
+        )
 
-        convertJsonNulltoPrimitiveNull(jsonResult)
-        jsonResult
+        convertJsonNulltoPrimitiveNull(result)
     }
 
-    def putResource(String uri, jsonData) {
-        if(!uri.startsWith('/')) {
-            uri = '/' + uri
-        }
+    def putResource(String uri, data) {
+        uri = absolute(uri)
 
-        def jsonResult
-
-        restClient.put(uri: uri.toString(),
-                data: jsonData,
-                headers: [ "Encoding" : "UTF-8"],
+        def result
+        restClient.put(uri: uri,
+                data: data,
+                headers: headers(),
                 success: {
-                    jsonResult = it.data
+                    result = it.data
                 },
                 failure: {
-                    onFailure(uri, 'PUT', jsonData, it)
-                })
+                    onFailure(uri, 'PUT', data, it)
+                }
+        )
 
-        convertJsonNulltoPrimitiveNull(jsonResult)
-        jsonResult
+        convertJsonNulltoPrimitiveNull(result)
     }
 
     void onFailure(uri, verb, jsonData, response) {
@@ -156,6 +152,18 @@ trait RestService {
             }
         }
         object
+    }
+
+    def private headers() {
+        def value = ["Encoding": "UTF-8"]
+        if (Scope.TEST()) {
+            value.put("X-Api-Test", true)
+        }
+        return value
+    }
+
+    def private absolute(String uri) {
+        uri.startsWith('/') ? uri : ('/' + uri);
     }
 
 }
